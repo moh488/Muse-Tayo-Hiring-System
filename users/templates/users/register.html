@@ -1,0 +1,25 @@
+{% extends 'base_auth.html' %}
+{% block title %}Register - Muuse Tayo Hiring System{% endblock %}
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card glass-panel">
+    <h1 class="auth-title">Staff Registration</h1>
+    <p class="auth-subtitle">Your account requires admin approval</p>
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<div class="alert alert-error">{{ field.errors }}</div>{% endif %}
+      </div>
+      {% endfor %}
+      <button type="submit" class="btn-primary" style="width:100%;">Register</button>
+    </form>
+    <p style="text-align:center;margin-top:1.5rem;font-size:0.875rem;">
+      <a href="{% url 'users:login' %}">Back to login</a>
+    </p>
+  </div>
+</div>
+<style>.auth-card input, .auth-card select { width:100%; padding:0.6rem; border-radius:10px; border:1px solid var(--glass-border); background:var(--glass-bg); color:var(--text-primary); }</style>
+{% endblock %}
