@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Pending Approval{% endblock %}
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card glass-panel">
+    <h1 class="auth-title">Registration Pending</h1>
+    <p class="auth-subtitle">Your account is awaiting administrative approval. You will be notified once verified.</p>
+    <div class="alert alert-info">Account: {{ user.username }} | Role: {{ user.get_role_display }}</div>
+    <a href="{% url 'users:logout' %}" class="btn-secondary" style="display:block;text-align:center;text-decoration:none;">Logout</a>
+  </div>
+</div>
+{% endblock %}

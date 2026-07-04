@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Muuse Tayo Hiring System{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{% static 'css/global_glass.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar glass-panel" id="sidebar">
+      <div class="auth-logo">🏗️</div>
+      <div class="sidebar-brand">Muuse Tayo Construction Co.</div>
+      <nav>
+        {% if user.is_authenticated %}
+          <!-- Visible to All Roles -->
+          <a href="{% url 'dashboard:index' %}" class="nav-link">📊 Dashboard</a>
+          <a href="{% url 'jobs:list_jobs' %}" class="nav-link">💼 Jobs</a>
+      
+
+          <!-- Visible to Admin & HR Only -->
+          {% if user.role == 'ADMIN' or user.role == 'HR_MANAGER' %}
+          <a href="{% url 'jobs:post_job' %}" class="nav-link">📝 Post a Job</a>
+          <a href="{% url 'applicants:applicant_list' %}" class="nav-link">
+            👥 Applicants
+            {% if unread_application_count %}
+            <span class="badge-count" style="margin-left: 5px; float: right; background-color: #ef4444; color: white; padding: 2px 6px; border-radius: 50%; font-size: 0.75rem;">{{ unread_application_count }}</span>
+            {% endif %}
+          </a>
+          <a href="{% url 'selection:selected_candidates' %}" class="nav-link">✅ Short List</a>
+          <a href="{% url 'interviews:schedule_interview' %}" class="nav-link">📅 Schedule Interview</a>
+          <a href="{% url 'interviews:interview_list' %}" class="nav-link">🗓️ Interviews</a>
+          {% endif %}
+          {% if user.role == 'ADMIN' %}
+          <a href="{% url 'users:add_user' %}" class="nav-link">➕ Add User</a>
+          <a href="{% url 'users:user_list' %}" class="nav-link">👤 Users</a>
+              <a href="{% url 'messages:chat_room' %}" class="nav-link">
+            💬 Messages
+            {% if unread_message_count %}
+            <span class="badge-count" style="margin-left: 5px; float: right; background-color: #ef4444; color: white; padding: 2px 6px; border-radius: 50%; font-size: 0.75rem;">{{ unread_message_count }}</span>
+            {% endif %}
+          </a>
+          <a href="{% url 'reports:analytics_dashboard' %}" class="nav-link">📈 Reports</a>
+          <a href="{% url 'verifications:pending_approvals' %}" class="nav-link">🔒 Pending Approvals</a>
+          <a href="{% url 'backups:export_panel' %}" class="nav-link">💾 Backups</a>
+          {% endif %}
+        {% endif %}
+      </nav>
+    </aside>
+
+    <div class="main-content">
+      {% if user.is_authenticated %}
+      <header class="top-ribbon glass-panel">
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">☰</button>
+        <div></div>
+        <div class="ribbon-actions">
+          <button class="icon-btn" id="theme-toggle" type="button">🌙 Dark</button>
+          {% if user.role == 'ADMIN' or user.role == 'HR_MANAGER' or user.role == 'RECRUITER' %}
+          <a href="{% url 'applicants:mark_all_read' %}" class="icon-btn" title="New job applications">
+            🔔 Notifications
+            {% if unread_application_count %}
+            <span class="badge-count" style="background-color:#ef4444; color:white; padding:2px 7px; border-radius:50%; font-size:0.75rem; margin-left:4px;">{{ unread_application_count }}</span>
+            {% endif %}
+          </a>
+          {% endif %}
+          <span class="icon-btn">{{ user.username }} ({{ user.get_role_display }})</span>
+          <a href="{% url 'users:logout' %}" class="btn-logout">Logout</a>
+        </div>
+      </header>
+      {% endif %}
+
+      <main class="page-content">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+  <script src="{% static 'js/global_theme.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Add User{% endblock %}
+{% block content %}
+<h1 class="page-title">Add System User</h1>
+<div class="glass-panel" style="padding:1.5rem;max-width:600px;">
+  <form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="form-group">
+      <label>{{ field.label }}</label>
+      {{ field }}
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn-primary">Create User</button>
+  </form>
+</div>
+<style>input, select { width:100%; padding:0.6rem; border-radius:10px; border:1px solid var(--glass-border); background:var(--glass-bg); color:var(--text-primary); }</style>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}User List{% endblock %}
+{% block content %}
+<h1 class="page-title">System Users</h1>
+<div class="glass-panel" style="padding:1.5rem;">
+  <table class="data-table">
+    <thead>
+      <tr><th>Username</th><th>Email</th><th>Role</th><th>Verified</th><th>Active</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td>{{ u.username }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.get_role_display }}</td>
+        <td>{{ u.is_verified|yesno:"Yes,No" }}</td>
+        <td>{{ u.is_active|yesno:"Active,Blocked" }}</td>
+        <td>
+          <form method="post" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="user_id" value="{{ u.id }}">
+            <input type="hidden" name="action" value="toggle_active">
+            <button type="submit" class="btn-secondary">{{ u.is_active|yesno:"Block,Activate" }}</button>
+          </form>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6">No users found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
