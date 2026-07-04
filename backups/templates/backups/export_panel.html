@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Data Export{% endblock %}
+{% block content %}
+<h1 class="page-title">Backup & Export Engine</h1>
+<div class="user-card-grid">
+  <div class="user-card glass-panel">
+    <h3>Excel — Candidates</h3>
+    <p>Export all job applications with candidate details.</p>
+    <a href="?export=candidates" class="btn-primary" style="text-decoration:none;display:inline-block;margin-top:0.5rem;">Download .xlsx</a>
+  </div>
+  <div class="user-card glass-panel">
+    <h3>Excel — Jobs</h3>
+    <p>Export all job requisitions.</p>
+    <a href="?export=jobs" class="btn-primary" style="text-decoration:none;display:inline-block;margin-top:0.5rem;">Download .xlsx</a>
+  </div>
+  <div class="user-card glass-panel">
+    <h3>PDF — Users Report</h3>
+    <p>System user directory summary.</p>
+    <a href="?export=users_pdf" class="btn-primary" style="text-decoration:none;display:inline-block;margin-top:0.5rem;">Download .pdf</a>
+  </div>
+  <div class="user-card glass-panel">
+    <h3>PDF — Applications Report</h3>
+    <p>Full applications summary report.</p>
+    <a href="?export=applications_pdf" class="btn-primary" style="text-decoration:none;display:inline-block;margin-top:0.5rem;">Download .pdf</a>
+  </div>
+</div>
+{% endblock %}
