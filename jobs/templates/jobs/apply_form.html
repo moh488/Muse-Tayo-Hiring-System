@@ -1,34 +1,232 @@
 {% extends 'base.html' %}
+{% block title %}Apply – {{ job.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ── Wrapper ─────────────────────────────────────── */
+  .apply-wrapper {
+    max-width: 640px;
+    margin: 2rem auto;
+  }
+
+  /* ── Card ────────────────────────────────────────── */
+  .apply-card {
+    padding: 2.25rem 2.5rem 2.5rem;
+    border-radius: 22px;
+  }
+
+  /* ── Header ──────────────────────────────────────── */
+  .apply-header {
+    margin-bottom: 1.75rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .apply-job-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent-blue);
+    margin-bottom: 0.35rem;
+  }
+
+  .apply-job-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem;
+    line-height: 1.3;
+  }
+
+  .apply-job-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .apply-meta-tag {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.22rem 0.65rem;
+    border-radius: 999px;
+    background: var(--glass-bg-hover);
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+  }
+
+  /* ── Form Grid ───────────────────────────────────── */
+  .apply-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .apply-grid .full-width { grid-column: 1 / -1; }
+
+  @media (max-width: 560px) {
+    .apply-grid { grid-template-columns: 1fr; }
+    .apply-card { padding: 1.5rem; }
+  }
+
+  /* ── Field Group ─────────────────────────────────── */
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .field-group label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .field-group .form-control,
+  .field-group textarea.form-control {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    border-radius: 12px;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.9rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    resize: vertical;
+  }
+
+  .field-group .form-control:focus,
+  .field-group textarea.form-control:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+  }
+
+  /* File input styling */
+  .field-group input[type="file"].form-control {
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+  }
+
+  /* ── Submit ──────────────────────────────────────── */
+  .btn-submit {
+    width: 100%;
+    padding: 0.85rem;
+    background: linear-gradient(135deg, #3b82f6, #312e81);
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    box-shadow: 0 5px 18px rgba(59,130,246,0.38);
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top: 0.5rem;
+  }
+
+  .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(59,130,246,0.5);
+  }
+
+  /* ── Section divider ─────────────────────────────── */
+  .section-label {
+    grid-column: 1 / -1;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent-indigo);
+    padding-top: 0.5rem;
+    padding-bottom: 0.1rem;
+    border-bottom: 1px solid var(--glass-border);
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="glass-panel" style="padding: 2rem; max-width: 600px; margin: 2rem auto;">
-    <h2>Job Applying: {{ job.title }}</h2>
-    <hr>
+<div class="apply-wrapper">
+  <div class="apply-card glass-panel">
+
+    <!-- Header -->
+    <div class="apply-header">
+      <p class="apply-job-label">📋 Job Application</p>
+      <h1 class="apply-job-title">{{ job.title }}</h1>
+      <div class="apply-job-meta">
+        <span class="apply-meta-tag">🏢 {{ job.get_department_display }}</span>
+        <span class="apply-meta-tag">📍 {{ job.location }}</span>
+        <span class="apply-meta-tag">🔖 {{ job.reference_code }}</span>
+        <span class="apply-meta-tag">📅 Deadline: {{ job.deadline|date:"M d, Y" }}</span>
+      </div>
+    </div>
+
+    <!-- Form -->
     <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        
-        <div style="margin-bottom: 1rem;">
-            <label>Full_Name:</label>
-            <input type="text" name="full_name" class="form-control" required style="width: 100%;">
+      {% csrf_token %}
+      <div class="apply-grid">
+
+        <!-- Section: Personal Info -->
+        <div class="section-label">👤 Personal Information</div>
+
+        <div class="field-group full-width">
+          <label>📛 Full Name</label>
+          <input type="text" name="full_name" class="form-control"
+                 placeholder="e.g. Ahmed Ali Hassan" required>
         </div>
 
-        <div style="margin-bottom: 1rem;">
-            <label>Location:</label>
-            <input type="text" name="location" class="form-control" required style="width: 100%;">
+        <div class="field-group">
+          <label>📞 Phone Number</label>
+          <input type="tel" name="phone_number" class="form-control"
+                 placeholder="e.g. +252 61 234 5678" required>
         </div>
 
-        <div style="margin-bottom: 1rem;">
-            <label>Education:</label>
-            <textarea name="education" class="form-control" rows="4" required style="width: 100%;"></textarea>
+        <div class="field-group">
+          <label>📧 Email Address</label>
+          <input type="email" name="email" class="form-control"
+                 placeholder="Enter your email" required>
         </div>
 
-        <div style="margin-bottom: 1rem;">
-            <label>Resume/PDF:</label>
-            <input type="file" name="resume" class="form-control" accept=".pdf,.doc,.docx" required style="width: 100%;">
+        <div class="field-group full-width">
+          <label>📍 Location</label>
+          <input type="text" name="location" class="form-control"
+                 placeholder="e.g. Hargeisa, Somaliland" required>
         </div>
 
-        <button type="submit" class="form-control" style="background-color: #0d6efd; color: white; cursor: pointer; border: none; padding: 10px; border-radius: 4px;">
-            Submit Application
-        </button>
+        <!-- Section: Qualifications -->
+        <div class="section-label">🎓 Qualifications & Experience</div>
+
+        <div class="field-group full-width">
+          <label>🏫 Education</label>
+          <textarea name="education" class="form-control" rows="3"
+                    placeholder="Describe your highest level of education, institution, and year of graduation…" required></textarea>
+        </div>
+
+        <div class="field-group full-width">
+          <label>💼 Years of Experience</label>
+          <input type="number" name="experience_years" class="form-control"
+                 min="0" max="50" placeholder="e.g. 3" required>
+        </div>
+
+        <!-- Section: Resume -->
+        <div class="section-label">📎 Resume</div>
+
+        <div class="field-group full-width">
+          <label>📄 Resume / PDF</label>
+          <input type="file" name="resume" class="form-control"
+                 accept=".pdf,.doc,.docx" required>
+        </div>
+
+        <!-- Submit -->
+        <div class="full-width">
+          <button type="submit" class="btn-submit">🚀 Submit Application</button>
+        </div>
+
+      </div><!-- /apply-grid -->
     </form>
+
+  </div>
 </div>
 {% endblock %}

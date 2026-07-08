@@ -1,47 +1,321 @@
 {% extends 'base.html' %}
 {% block title %}Job Listings{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ── Page Header ─────────────────────────────────── */
+  .jobs-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .jobs-page-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-indigo), var(--accent-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+  }
+
+  .jobs-count-badge {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-indigo));
+    color: white;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.3rem 0.85rem;
+    border-radius: 999px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Grid ────────────────────────────────────────── */
+  .jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 1100px) { .jobs-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 680px)  { .jobs-grid { grid-template-columns: 1fr; } }
+
+  /* ── Card ────────────────────────────────────────── */
+  .job-card {
+    background: var(--glass-bg);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.28s cubic-bezier(0.4,0,0.2,1),
+                box-shadow 0.28s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .job-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 50px rgba(59,130,246,0.18);
+  }
+
+  /* ── Card Image Banner ───────────────────────────── */
+  .job-card-image {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    display: block;
+    background: linear-gradient(135deg, #e0e7ff 0%, #bfdbfe 100%);
+    position: relative;
+  }
+
+  .job-card-image-placeholder {
+    width: 100%;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Department colour themes */
+  .dept-CIVIL   { background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%); }
+  .dept-MEP     { background: linear-gradient(135deg, #fef3c7 0%, #fcd34d 100%); }
+  .dept-ARCH    { background: linear-gradient(135deg, #ede9fe 0%, #c4b5fd 100%); }
+  .dept-SAFETY  { background: linear-gradient(135deg, #d1fae5 0%, #6ee7b7 100%); }
+  .dept-ADMIN   { background: linear-gradient(135deg, #fee2e2 0%, #fca5a5 100%); }
+  .dept-DEFAULT { background: linear-gradient(135deg, #e0e7ff 0%, #a5b4fc 100%); }
+
+  .job-card-image-placeholder::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.25);
+    border-radius: 0;
+  }
+
+  /* ── Card Body ───────────────────────────────────── */
+  .job-card-body {
+    padding: 1.1rem 1.25rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 0.5rem;
+  }
+
+  .job-card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.35;
+  }
+
+  .job-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .job-meta-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.22rem 0.6rem;
+    border-radius: 999px;
+    background: var(--glass-bg-hover);
+    color: var(--text-secondary);
+    border: 1px solid var(--glass-border);
+  }
+
+  .job-card-desc {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    line-height: 1.55;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex: 1;
+  }
+
+  .job-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--glass-border);
+  }
+
+  .job-deadline {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  /* ── Apply / Pending Buttons ─────────────────────── */
+  .btn-apply {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: linear-gradient(135deg, #3b82f6, #312e81);
+    color: white;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 0.48rem 1.1rem;
+    border-radius: 10px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: transform 0.18s, box-shadow 0.18s, opacity 0.18s;
+    box-shadow: 0 4px 14px rgba(59,130,246,0.35);
+  }
+
+  .btn-apply:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 20px rgba(59,130,246,0.5);
+    opacity: 0.95;
+  }
+
+  .btn-pending {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 0.48rem 1.1rem;
+    border-radius: 10px;
+    border: none;
+    cursor: not-allowed;
+    letter-spacing: 0.02em;
+    box-shadow: 0 4px 14px rgba(245,158,11,0.3);
+    opacity: 0.85;
+  }
+
+  /* ── Status pill on image ─────────────────────────── */
+  .job-status-pill {
+    position: absolute;
+    top: 0.65rem;
+    right: 0.65rem;
+    z-index: 2;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.22rem 0.65rem;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .pill-ACTIVE { background: #10b981; color: white; }
+  .pill-PAUSED { background: #f59e0b; color: white; }
+  .pill-CLOSED { background: #ef4444; color: white; }
+  .pill-DRAFT  { background: #64748b; color: white; }
+
+  /* ── Empty State ─────────────────────────────────── */
+  .jobs-empty {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+    color: var(--text-secondary);
+    gap: 1rem;
+  }
+
+  .jobs-empty .empty-icon { font-size: 3.5rem; }
+  .jobs-empty p { font-size: 1rem; margin: 0; }
+</style>
+{% endblock %}
+
 {% block content %}
-<h1 class="page-title">Job Requisitions</h1>
-<!--div class="filter-bar">
-  <select class="form-control" style="width:auto;" onchange="location.href='?department='+this.value+'&status={{ request.GET.status }}'">
-    <option value="">All Departments</option>
-    {% for val, label in departments %}
-    <option value="{{ val }}" {% if request.GET.department == val %}selected{% endif %}>{{ label }}</option>
-    {% endfor %}
-  </select>
-  <select class="form-control" style="width:auto;" onchange="location.href='?status='+this.value+'&department={{ request.GET.department }}'">
-    <option value="">All Statuses</option>
-    {% for val, label in statuses %}
-    <option value="{{ val }}" {% if request.GET.status == val %}selected{% endif %}>{{ label }}</option>
-    {% endfor %}
-  </select>
-  <a href="{% url 'jobs:post_job' %}" class="btn-primary" style="text-decoration:none;">+ Post New Job</a>
-</div-->
-<div class="glass-panel" style="padding:1.5rem;">
-  <table class="data-table">
-    <thead><tr><th>Ref Code</th><th>Title</th><th>Department</th><th>Status</th><th>Deadline</th><th>Actions</th></tr></thead>
-    <tbody>
-      {% for job in jobs %}
-      <tr>
-        <td>{{ job.reference_code }}</td>
-        <td>{{ job.title }}</td>
-        <td>{{ job.get_department_display }}</td>
-        <td>{{ job.get_status_display }}</td>
-        <td>{{ job.deadline|date:"M d, Y" }}</td>
-        <td>
-            {% if job.id in applied_job_ids %}
-                <button class="form-control" disabled style="width:auto; background-color: #faba08; color: #fff; cursor: not-allowed; border: none;">
-                    Pending
-                </button>
-            {% else %}
-                <a href="{% url 'jobs:apply_for_job' job.id %}" class="form-control" style="width:auto; background-color: #0d6efd; color: #fff; text-decoration: none; text-align: center; display: inline-block; border: none; padding: 6px 12px; border-radius: 4px;">
-                    Apply
-                </a>
-            {% endif %}
-                </td>
-      </tr>
-      {% empty %}<tr><td colspan="6">No jobs found.</td></tr>{% endfor %}
-    </tbody>
-  </table>
+<div class="jobs-page-header">
+  <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+    <h1 class="jobs-page-title">💼 Jobs Requisition</h1>
+    {% if jobs %}
+      <span class="jobs-count-badge">{{ jobs|length }} open position{{ jobs|length|pluralize }}</span>
+    {% endif %}
+  </div>
+  {% if user.role == 'ADMIN' or user.role == 'HR_MANAGER' or user.role == 'RECRUITER' %}
+  <a href="{% url 'jobs:post_job' %}" class="btn-apply" style="box-shadow:0 4px 14px rgba(49,46,129,0.3);">
+    ＋ Post a Job
+  </a>
+  {% endif %}
+</div>
+
+<div class="jobs-grid">
+  {% for job in jobs %}
+  {% with dept=job.department %}
+  <div class="job-card glass-panel">
+
+    <!-- Image / Banner -->
+    <div style="position:relative;">
+      <div class="job-card-image-placeholder
+        {% if dept == 'CIVIL' %}dept-CIVIL
+        {% elif dept == 'MEP' %}dept-MEP
+        {% elif dept == 'ARCH' %}dept-ARCH
+        {% elif dept == 'SAFETY' %}dept-SAFETY
+        {% elif dept == 'ADMIN' %}dept-ADMIN
+        {% else %}dept-DEFAULT{% endif %}">
+        {% if dept == 'CIVIL' %}🏗️
+        {% elif dept == 'MEP' %}⚡
+        {% elif dept == 'ARCH' %}🏛️
+        {% elif dept == 'SAFETY' %}🦺
+        {% elif dept == 'ADMIN' %}📊
+        {% else %}💼{% endif %}
+      </div>
+      <span class="job-status-pill pill-{{ job.status }}">{{ job.get_status_display }}</span>
+    </div>
+
+    <!-- Body -->
+    <div class="job-card-body">
+      <h2 class="job-card-title">{{ job.title }}</h2>
+
+      <div class="job-card-meta">
+        <span class="job-meta-tag">🏢 {{ job.get_department_display }}</span>
+        <span class="job-meta-tag">📍 {{ job.location }}</span>
+        <span class="job-meta-tag">🔖 {{ job.reference_code }}</span>
+      </div>
+
+      <p class="job-card-desc">{{ job.requirements }}</p>
+
+      <!-- Footer: deadline + button -->
+      <div class="job-card-footer">
+        <span class="job-deadline">
+          📅 Deadline: {{ job.deadline|date:"M d, Y" }}
+        </span>
+
+        {% if job.id in applied_job_ids %}
+          <button class="btn-pending" disabled>⏳ Pending</button>
+        {% else %}
+          <a href="{% url 'jobs:apply_for_job' job.id %}" class="btn-apply">Apply →</a>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+  {% endwith %}
+  {% empty %}
+  <div class="jobs-empty glass-panel">
+    <span class="empty-icon">📭</span>
+    <p>No job postings available right now. Check back soon!</p>
+  </div>
+  {% endfor %}
 </div>
 {% endblock %}

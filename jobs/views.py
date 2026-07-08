@@ -65,15 +65,18 @@ def apply_for_job(request, job_id):
         full_name = request.POST.get('full_name', '')
         location = request.POST.get('location', '')
         education = request.POST.get('education', '')
-        resume = request.FILES.get('resume')  
-        
+        phone_number = request.POST.get('phone_number', '') or request.user.phone_number or ''
+        email = request.POST.get('email', '') or request.user.email
+        experience_years = int(request.POST.get('experience_years', 0) or 0)
+        resume = request.FILES.get('resume')
+
         # 1. Create the front-end JobApplication record
         JobApplication.objects.create(
             job=job,
             user=request.user,
             full_name=full_name,
-            email=request.user.email,
-            phone_number=request.user.phone_number or '',
+            email=email,
+            phone_number=phone_number,
             location=location,
             education=education,
             resume=resume
@@ -85,13 +88,13 @@ def apply_for_job(request, job_id):
         last_name = name_parts[1] if len(name_parts) > 1 else ''
         
         candidate, _ = Candidate.objects.get_or_create(
-            email=request.user.email,
+            email=email,
             defaults={
                 'first_name': first_name,
                 'last_name': last_name,
-                'phone': request.user.phone_number or '',
+                'phone': phone_number,
                 'resume': resume,
-                'experience_years': 0,
+                'experience_years': experience_years,
                 'skills': 'Applied online',
             }
         )
